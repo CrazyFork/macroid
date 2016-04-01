@@ -3,12 +3,13 @@ package macroid
 import android.view.{ ViewGroup, View }
 import scala.concurrent.Future
 
-/** A Tweak is something that mutates a widget */
+/** ! A Tweak is something that mutates a widget */
 case class Tweak[-W <: View](f: W ⇒ Unit) {
+  // notice: this Tweak instance can call apply with ()
   def apply(w: W) = Ui(f(w))
 
   /** Combine (sequence) with another tweak */
-  def +[W1 <: W](that: Tweak[W1]) = Tweak[W1] { x ⇒
+  def +[W1 <: W](that: Tweak[W1]) = Tweak[W1] { x ⇒ // x <: View
     this.f(x)
     that.f(x)
   }

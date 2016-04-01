@@ -5,9 +5,11 @@ import android.os.Bundle
 import macrocompat.bundle
 import scala.reflect.macros.blackbox
 
+//bm: private keywork is good for hiding implementations
 private[macroid] trait Bundles {
   def bundle(pairs: (String, Any)*): Bundle = macro BundleMacros.bundleImpl
 
+  //bm: import Bundles._ 的时候 这个implicit 就默认载入了
   implicit class BundleAddition(b: Bundle) {
     def +(other: Bundle) = {
       val c = new Bundle
@@ -19,7 +21,7 @@ private[macroid] trait Bundles {
 }
 
 object Bundles extends Bundles
-
+//todo:
 @bundle
 class BundleMacros(val c: blackbox.Context) {
   import c.universe._

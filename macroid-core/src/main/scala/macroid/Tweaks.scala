@@ -81,9 +81,9 @@ private[macroid] trait TextTweaks {
   }
 
   /** Set hint */
-  def hint(hint: CharSequence) = Tweak[TextView](_.setHint(hint))
+  def hint(hint: CharSequence) = Tweak[TextView](_.setHint(hint)) // Sets the text to be displayed when the text of the TextView is empty
   /** Set hint */
-  def hint(hint: Int) = Tweak[TextView](_.setHint(hint))
+  def hint(hint: Int) = Tweak[TextView](_.setHint(hint)) // Sets the text to be displayed when the text of the TextView is empty, from a resource.
   /** Set hint */
   def hint(hint: Either[Int, CharSequence]) = hint match {
     case Right(t) ⇒ Tweak[TextView](_.setHint(t))
@@ -122,7 +122,8 @@ object Tweaks extends Tweaks
 class BasicTweakMacros(val c: blackbox.Context) {
   import c.universe._
 
-  def wireImpl[W <: View: c.WeakTypeTag](v: c.Expr[W]): Tree = {
+  //todo: 这步会将最终的 view 绑定到 v 上? 还有为什么不直接 new 一个 Tweak 出来, 非要用 macro
+  def wireImpl[W <: View : c.WeakTypeTag](v: c.Expr[W]): Tree = {
     q"_root_.macroid.Tweak[${weakTypeOf[W]}] { x ⇒ $v = x }"
   }
 
@@ -136,6 +137,7 @@ class LayoutTweakMacros(val c: blackbox.Context) {
   import c.universe._
 
   def layoutParams(l: c.Type, params: Seq[c.Expr[Any]]) = {
+    // ${l.typeSymbol.companion} return companion object(subtype of Symbol of course) if existed
     q"_root_.macroid.Tweak[_root_.android.view.View] { x ⇒ x.setLayoutParams(new ${l.typeSymbol.companion}.LayoutParams(..$params)) }"
   }
 

@@ -1,0 +1,39 @@
+notation:
+  bm: book mark
+  todo: todos
+  -todo-: finished todos
+
+feature:
+  FragmentApi.scala
+    提供自动向后兼容的api
+
+
+todo:
+  done: 
+  pending:
+    UiActions.scala
+      android looper
+      calling ui method in android non-main thread
+      Future - scala
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

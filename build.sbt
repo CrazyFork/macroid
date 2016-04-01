@@ -11,6 +11,7 @@ val commonSettings = androidBuildAar ++ bintrayPublishSettings ++ Seq(
 
   scalaVersion := "2.11.7",
   crossScalaVersions := Seq("2.10.6", "2.11.7"),
+  javaOptions in Runtime += "-Dsdk.dir=/usr/local/opt/android-sdk",
   javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
   scalacOptions ++= Seq(
     "-feature",

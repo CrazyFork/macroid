@@ -43,14 +43,16 @@ class Ui[+A](private[Ui] val v: () ⇒ A) {
 
   /** Combine (sequence) with another UI action */
   def ~[B](next: ⇒ Ui[B]) = Ui { v(); next.v() } //bm: {} vs ()
+  // this could be implemented by flatMap
+  // def ~[B](next: => Ui[B]):Ui[B] = flatMap( _ => next )
 
   /** Wait until this action is finished and combine (sequence) it with another one */
   def ~~[B, C](next: ⇒ Ui[B])(implicit evidence: A <:< Future[C]) = Ui {
-    evidence(v()) mapUi (_ ⇒ next)
+    evidence(v()) mapUi (_ ⇒ next)// 这个 v() 换成 run 是不是更好
   }
 
   /** Run the action on the UI thread */
-  def run = if (Ui.uiThread == Thread.currentThread) {
+  def run:Future[A] = if (Ui.uiThread == Thread.currentThread) {
     Try(v()) match {// if v() throws Exception, Future.failed is called, otherwise Success with Result
       case Success(x) ⇒ Future.successful(x)
       case Failure(x) ⇒ Future.failed(x)
