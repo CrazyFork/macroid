@@ -1,10 +1,12 @@
-项目用到的 scala 特性
+项目用到的 scala/java 特性
   scala Type Dynamic
     http://docs.scala-lang.org/sips/completed/type-dynamic.html
 
   scala Future
 
   scala Macro
+
+  [Java WeakReference的理解与使用](http://puretech.iteye.com/blog/2008663)
 
 
 
@@ -64,6 +66,7 @@ todo:
     清理todos
     [asyc await](http://docs.scala-lang.org/sips/pending/async.html) @Snailing.scala
 
+    read original project issues
 
 
 
