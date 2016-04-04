@@ -48,12 +48,12 @@ class Ui[+A](private[Ui] val v: () ⇒ A) {
 
   /** Wait until this action is finished and combine (sequence) it with another one */
   def ~~[B, C](next: ⇒ Ui[B])(implicit evidence: A <:< Future[C]) = Ui {
-    evidence(v()) mapUi (_ ⇒ next)// 这个 v() 换成 run 是不是更好
+    evidence(v()) mapUi (_ ⇒ next) // 这个 v() 换成 run 是不是更好
   }
 
   /** Run the action on the UI thread */
-  def run:Future[A] = if (Ui.uiThread == Thread.currentThread) {
-    Try(v()) match {// if v() throws Exception, Future.failed is called, otherwise Success with Result
+  def run: Future[A] = if (Ui.uiThread == Thread.currentThread) {
+    Try(v()) match { // if v() throws Exception, Future.failed is called, otherwise Success with Result
       case Success(x) ⇒ Future.successful(x)
       case Failure(x) ⇒ Future.failed(x)
     }
@@ -83,14 +83,14 @@ object Ui {
 
   /** Combine (sequence) several UI actions together */
   // be careful, since `vs.map(_.v())` is still wrap in class Ui, so it is still lazy
-  def sequence[A](vs: Ui[A]*) = Ui(vs.map(_.v())) 
+  def sequence[A](vs: Ui[A]*) = Ui(vs.map(_.v()))
 
   /** Run a UI action on the UI thread */
   def run[A](ui: Ui[A]) = ui.run
 
   /** Run several UI actions on the UI thread */
   //trigger ui evaluation, v is defined in class UI defination
-  def run[A](ui1: Ui[A], ui2: Ui[A], uis: Ui[A]*) = sequence(ui1 +: ui2 +: uis: _*).run 
+  def run[A](ui1: Ui[A], ui2: Ui[A], uis: Ui[A]*) = sequence(ui1 +: ui2 +: uis: _*).run
 
   /** Get the result of executing an UI action on the current (hopefully, UI!) thread */
   def get[A](ui: Ui[A]) = ui.get
@@ -98,7 +98,7 @@ object Ui {
 
 /** Helpers to run UI actions as Future callbacks */
 // more info about Future: http://docs.scala-lang.org/overviews/core/futures.html
-case class UiFuture[T](future: Future[T]) extends AnyVal {//todo: why extends AnyVal
+case class UiFuture[T](future: Future[T]) extends AnyVal { //todo: why extends AnyVal
   /*
   -todo-: difference between Function and PartialFunction
           PartialFunction can be applied to Pattern Match in scala?
@@ -137,9 +137,13 @@ case class UiFuture[T](future: Future[T]) extends AnyVal {//todo: why extends An
     * If the future is already completed and the current thread is the UI thread,
     * the UI action will be applied in-place, rather than asynchronously.
     */
-  def flatMapUi[S](f: Function[T, Ui[Future[S]]]) = {
+  def flatMapUi[S](f: Function[T, Ui[Future[S]]]) = {//return Future[X] not S
     if (future.isCompleted && Ui.uiThread == Thread.currentThread) {
-      future.value.get.map(applyUi(f)) match {//todo: Future[S] 在这步没有完成状态应该怎么算
+      /*
+      -todo-: Future[S] 在这步没有完成状态应该怎么算？
+        上面已经判断了
+       */
+      future.value.get.map(applyUi(f)) match {
         case Success(x) ⇒ x
         case Failure(t) ⇒ Future.failed(t)
       }
@@ -153,7 +157,7 @@ case class UiFuture[T](future: Future[T]) extends AnyVal {//todo: why extends An
     * If the future is already completed and the current thread is the UI thread,
     * the UI action will be applied in-place, rather than asynchronously.
     */
-  def foreachUi[U](f: Function[T, Ui[U]]) =
+  def foreachUi[U](f: Function[T, Ui[U]]):Unit =
     if (future.isCompleted && Ui.uiThread == Thread.currentThread) {
       future.value.get.foreach(applyUi(f))
     } else {

@@ -6,6 +6,17 @@ import scala.language.higherKinds
 import scala.concurrent.{ Future, ExecutionContext }
 import scala.util.Try
 
+
+/*
+this module easy container Types for calling UiAction on its items
+
+container including:
+  TraversableOnce
+  Option
+  Try
+  Future
+ */
+
 trait Effector[-F[_]] {
   def foreach[A](fa: F[A])(f: A ⇒ Ui[Any]): Unit
 }
@@ -25,6 +36,7 @@ object Effector {
   }
 
   implicit def `Future is Effector`(implicit ec: ExecutionContext) = new Effector[Future] {
+    // Future -> UiFuture 的implicit conversion 定义在了package.scala中
     def foreach[A](fa: Future[A])(f: A ⇒ Ui[Any]) = fa.mapUi(f)
   }
 }

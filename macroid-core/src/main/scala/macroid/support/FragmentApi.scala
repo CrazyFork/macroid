@@ -31,6 +31,7 @@ private[macroid] trait LegacyFragment {
 
 object Fragment extends ModernFragment with LegacyFragment
 
+// F: Fragment, M: FragmentManager, A: Activity
 sealed trait FragmentApi[-F, M, -A] {
   def fragmentManager: F ⇒ M
   def activityManager: A ⇒ M

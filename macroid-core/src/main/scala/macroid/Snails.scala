@@ -10,7 +10,7 @@ import java.util.concurrent.{ TimeUnit, Executors }
 import scala.util.control.NonFatal
 
 private[macroid] object SnailScheduler {
-  val scheduler = Executors.newScheduledThreadPool(1)
+  val scheduler = Executors.newScheduledThreadPool(1) // all animation will reuse this thread
   def snailSchedulerEc(millis: Long) = new ExecutionContext {
     def execute(runnable: Runnable) = scheduler.schedule(runnable, millis, TimeUnit.MILLISECONDS)
 
@@ -18,25 +18,28 @@ private[macroid] object SnailScheduler {
   }
 }
 
+//discard result, convert future to new with recover abilities but discard f's result
 private[macroid] object AfterFuture {
-  def apply[A](f: Future[A])(implicit ec: ExecutionContext) =
-    f.map(_ ⇒ ()) recover { case NonFatal(_) ⇒ () }
+  def apply[A](f: Future[A])(implicit ec: ExecutionContext):Future[Unit] =
+    f.map(_ ⇒ ()) recover { case NonFatal(_) ⇒ () } //recover on non-fatal error
 }
 
 private[macroid] trait BasicSnails {
   import SnailScheduler._
 
   /** A delay to be inserted somewhere between <~~s and <~s */
+  // A delay snail for x milisecs
   def delay(millis: Long) = Snail[View](x ⇒ Future(())(snailSchedulerEc(millis)))
 
   /** A snail that waits for a given future to finish */
   def wait(f: Future[Any])(implicit ec: ExecutionContext) = Snail[View](x ⇒ AfterFuture(f))
 }
 
+// utilities for control progress bar
 private[macroid] trait ProgressSnails extends BasicSnails with VisibilityTweaks {
   /** Show this progress bar with indeterminate progress and hide it once `future` is done */
   def waitProgress(future: Future[Any])(implicit ec: ExecutionContext): Snail[ProgressBar] =
-    Tweak[ProgressBar](_.setIndeterminate(true)) + show ++ wait(future) + hide
+    Tweak[ProgressBar](_.setIndeterminate(true)) + show ++ wait(future) + hide // hide wont be call if wait(future) failed
 
   /** Show this progress bar with determinate progress and hide it once all `futures` are done */
   def waitProgress(futures: List[Future[Any]])(implicit ec: ExecutionContext): Snail[ProgressBar] =

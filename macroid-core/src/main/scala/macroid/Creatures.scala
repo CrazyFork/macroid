@@ -27,6 +27,7 @@ object Tweak {
 }
 
 /** A snail mutates the view slowly (e.g. animation) */
+//todo: -W ?
 case class Snail[-W <: View](f: W ⇒ Future[Unit]) {
   def apply(w: W) = Ui(f(w))
 

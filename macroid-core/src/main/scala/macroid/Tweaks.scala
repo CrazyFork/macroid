@@ -44,7 +44,7 @@ private[macroid] trait PaddingTweaks {
 
   /** Set padding */
   def padding(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0, all: Int = -1) = if (all >= 0) {
-    Tweak[View](_.setPadding(all, all, all, all))
+    Tweak[View](_.setPadding(all, all, all, all))// _ stands for the targeted view component
   } else {
     Tweak[View](_.setPadding(left, top, right, bottom))
   }
@@ -55,7 +55,7 @@ private[macroid] trait LayoutTweaks {
   /** Use `LayoutParams` of the specified layout class */
   def layoutParams[L <: ViewGroup](params: Any*): Tweak[View] = macro LayoutTweakMacros.layoutParamsImpl[L]
   /** Use `LayoutParams` of the specified layout class */
-  def lp[L <: ViewGroup](params: Any*): Tweak[View] = macro LayoutTweakMacros.layoutParamsImpl[L]
+  def lp          [L <: ViewGroup](params: Any*): Tweak[View] = macro LayoutTweakMacros.layoutParamsImpl[L]
 
   /** Make this layout vertical */
   val vertical = Tweak[LinearLayout](_.setOrientation(LinearLayout.VERTICAL))
@@ -107,6 +107,8 @@ private[macroid] trait EventTweaks {
 }
 
 /** This trait provides the most useful tweaks. For an expanded set, see `contrib.ExtraTweaks` */
+
+// bm: this is a technique make compose a larger module from smaller modules
 private[macroid] trait Tweaks
   extends BasicTweaks
   with VisibilityTweaks
@@ -118,12 +120,21 @@ private[macroid] trait Tweaks
 
 object Tweaks extends Tweaks
 
+/*
+-todo-: ?
+  http://docs.scala-lang.org/overviews/macros/bundles
+
+  https://github.com/milessabin/macro-compat:
+    macro-compat is a small library which, in conjunction with the macro-paradise
+    compiler plugin, allows you to compile macros with Scala 2.10.x which are written
+    to the Scala 2.11/2 macro API.
+ */
 @bundle
 class BasicTweakMacros(val c: blackbox.Context) {
   import c.universe._
 
   //todo: 这步会将最终的 view 绑定到 v 上? 还有为什么不直接 new 一个 Tweak 出来, 非要用 macro
-  def wireImpl[W <: View : c.WeakTypeTag](v: c.Expr[W]): Tree = {
+  def wireImpl[W <: View: c.WeakTypeTag](v: c.Expr[W]): Tree = {
     q"_root_.macroid.Tweak[${weakTypeOf[W]}] { x ⇒ $v = x }"
   }
 
@@ -131,6 +142,7 @@ class BasicTweakMacros(val c: blackbox.Context) {
     q"_root_.macroid.Tweak[${weakTypeOf[W]}] { x ⇒ $v = Some(x) }"
   }
 }
+
 
 @bundle
 class LayoutTweakMacros(val c: blackbox.Context) {
@@ -145,6 +157,9 @@ class LayoutTweakMacros(val c: blackbox.Context) {
     var tp = layoutType
 
     // go up the inheritance chain until we find a suitable LayoutParams class in the companion
+    //bm: c.typecheck is used to check whether this AST mutation
+    // (dynamically Tweak creation operated on LayoutParams on unknown android view or scala Type)
+    // could actually work
     while (scala.util.Try(c.typecheck(layoutParams(tp, params))).isFailure) {
       if (tp.baseClasses.length > 2) {
         tp = tp.baseClasses(1).asType.toType
@@ -164,10 +179,11 @@ class LayoutTweakMacros(val c: blackbox.Context) {
 class EventTweakMacros(val c: blackbox.Context) {
   import c.universe._
 
+  // get all the info of binding event on target type
   private def onBase(event: c.Expr[String], tp: c.Type) = {
     // find the setter
-    val Expr(Literal(Constant(eventName: String))) = event
-    val setter = scala.util.Try {
+    val Expr(Literal(Constant(eventName: String))) = event // use scala extractor to extract eventName out (as scala variable)
+    val setter = scala.util.Try { // get setter method eg. setOnClickListener
       val s = tp.member(TermName(s"setOn${eventName.capitalize}Listener")).asMethod
       assert(s != NoSymbol); s
     } getOrElse {
@@ -175,7 +191,7 @@ class EventTweakMacros(val c: blackbox.Context) {
     }
 
     // find the method to override
-    val listener = setter.paramLists(0)(0).typeSignature
+    val listener = setter.paramLists(0)(0).typeSignature // get first param, in scala params are pass as List[List[T]]
     val on = scala.util.Try {
       val x = listener.member(TermName(s"on${eventName.capitalize}")).asMethod
       assert(x != NoSymbol); x
@@ -183,14 +199,34 @@ class EventTweakMacros(val c: blackbox.Context) {
       c.abort(c.enclosingPosition, s"Unsupported event listener class in $setter")
     }
 
-    (setter, listener, on, tp)
+    /*
+    button.setOnClickListener(new View.OnClickListener() {
+         public void onClick(View v) {
+             // Perform action on click
+         }
+     });
+
+     in this case:
+      setter:  button.setOnClickListener
+      listener: View.OnClickListener
+      on: public void onClick(View v)
+      tp: Button
+     */
+    (setter, listener, on, tp)// setter, listener setter
   }
 
   sealed trait ListenerType
-  object FuncListener extends ListenerType
-  object UnitListener extends ListenerType
+  object FuncListener extends ListenerType // 最终调用setOnclickListener 这样的 tweak
+  object UnitListener extends ListenerType // call Ui[A].get on specific event triggering
 
   def getListener(tpe: c.Type, setter: c.universe.MethodSymbol, listener: c.Type, on: c.universe.MethodSymbol, f: c.Expr[Any], mode: ListenerType): Tree = {
+    /*
+    -todo-:
+      freshName: generate unique name
+        http://docs.scala-lang.org/overviews/quasiquotes/hygiene
+
+      TermName 感觉就是一个 String wrapper
+     */
     val args = on.paramLists(0).map(_ ⇒ TermName(c.freshName("arg")))
     val params = args zip on.paramLists(0) map { case (a, p) ⇒ q"val $a: ${p.typeSignature}" }
     lazy val argIdents = args.map(a ⇒ Ident(a))
@@ -204,7 +240,21 @@ class EventTweakMacros(val c: blackbox.Context) {
   def onUnitImpl[W <: View: c.WeakTypeTag](event: c.Expr[String])(handler: c.Expr[Ui[Any]]): Tree = {
     val (setter, listener, on, tp) = onBase(event, weakTypeOf[W])
     scala.util.Try {
-      if (!(on.returnType =:= typeOf[Unit])) assert((handler.actualType match { case TypeRef(_, _, t :: _) ⇒ t }) <:< on.returnType)
+      /*
+      scala.reflect.api.Exprs.Expr
+        Type of the wrapped expression tree as found in the underlying tree.
+        最终的 expression 的 type, eg.
+          {println(3); 4} // 最终返回的应该是Int
+
+      TypeRef:
+        http://www.scala-lang.org/api/2.11.7/scala-reflect/index.html#scala.reflect.api.Types$TypeRef
+
+      note `<:<` usage
+
+       */
+      if (!(on.returnType =:= typeOf[Unit]))
+        // check whether Ui[Any]'s return type match(subtype of) target's view's event handler's return type defination
+        assert((handler.actualType match { case TypeRef(_, _, t :: _) ⇒ t }) <:< on.returnType)
       getListener(tp, setter, listener, on, c.Expr(c.untypecheck(handler.tree)), UnitListener)
     } getOrElse {
       c.abort(c.enclosingPosition, s"handler should be of type Ui[${on.returnType}]")

@@ -10,7 +10,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 trait CanSnail[W, -S, R] {
   def snail(w: W, s: S): Ui[Future[R]]
 }
-
+// 这个模块的逻辑和 tweaking 的是一样的
 object CanSnail {
   implicit def `Widget is snailable with Snail`[W <: View](implicit ec: ExecutionContext): CanSnail[W, Snail[W], W] =
     new CanSnail[W, Snail[W], W] {
@@ -70,6 +70,7 @@ object CanSnail {
     }
 
   implicit def `TraversableOnce is snailable`[W, S, R, C[X] <: TraversableOnce[X]](implicit canSnail: CanSnail[W, S, R]): CanSnail[C[W], S, C[W]] =
+    //C[W] is container of widget, operate on each widegt return the same widget container back
     new CanSnail[C[W], S, C[W]] {
       def snail(l: C[W], s: S) = Ui(async {
         val it = l.toIterator

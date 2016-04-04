@@ -18,6 +18,14 @@ Contexts[View], otherwise pass an instance of `ContextWrapper` from outside.""")
 sealed trait ContextWrapper {
   type C <: Context
 
+  /*
+  -todo-:
+    java 的WeakReference的特性就是如果没有其他的strong reference, 这个对象就会被gc回收掉
+      http://puretech.iteye.com/blog/2008663
+
+  todo: why use WeakReference here?
+    because ContextWrapper will automatically be GCed, when there's no strong reference to it?
+   */
   def original: WeakReference[C]
   def application: Context
 
@@ -37,7 +45,9 @@ case class ApplicationContextWrapper(original: WeakReference[Application], appli
 case class GenericContextWrapper(original: WeakReference[Context], application: Context)
   extends ContextWrapper { type C = Context }
 
+// todo: why differentiate theses activities
 object ContextWrapper {
+  //bm: apply method overloading
   def apply(activity: Activity): ActivityContextWrapper =
     ActivityContextWrapper(WeakReference(activity), activity.getApplicationContext)
 
@@ -72,7 +82,8 @@ case class FragmentManagerContext[-F, M](manager: M)(implicit val fragmentApi: F
   def get = manager
 }
 
-trait Contexts[X] { self: X ⇒
+// any X extends this trait will automatically have this (x)=>ActivityContextWrapper implicit conversion
+trait Contexts[X] { self: X ⇒ //-todo-: self:X 之类的this
   implicit def activityContextWrapper(implicit activity: X <:< Activity): ActivityContextWrapper =
     ContextWrapper(activity(self))
 
@@ -85,6 +96,7 @@ trait Contexts[X] { self: X ⇒
   implicit def viewContextWrapper(implicit view: X <:< View): ContextWrapper =
     ContextWrapper(view(self))
 
+  //todo: difference between the following two?
   implicit def activityManagerContext[M, F, A >: X](implicit fragmentApi: FragmentApi[F, M, A]) =
     FragmentManagerContext[F, M](fragmentApi.activityManager(self))
 
