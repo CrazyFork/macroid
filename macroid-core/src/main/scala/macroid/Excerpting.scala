@@ -26,7 +26,7 @@ object CanExcerpt {
 
   implicit def `Option is excerptable`[W, E, R](implicit canExcerpt: CanExcerpt[W, E, R]): CanExcerpt[Option[W], E, Option[R]] =
     new CanExcerpt[Option[W], E, Option[R]] {
-      def excerpt(o: Option[W], e: E) = o.fold(Ui(Option.empty[R])) { w ⇒
+      def excerpt(o: Option[W], e: E) = o.fold(Ui(Option.empty[R])) { w ⇒ // todo: why use Option.empty[R] instead of None
         canExcerpt.excerpt(w, e).map(Some.apply)
       }
     }

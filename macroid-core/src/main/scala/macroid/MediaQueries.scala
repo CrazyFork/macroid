@@ -42,7 +42,7 @@ private[macroid] trait OrientationQueries {
   def landscape(implicit ctx: ContextWrapper) =
     MediaQuery(ctx.application.getResources.getConfiguration.orientation == Configuration.ORIENTATION_LANDSCAPE)
 }
-
+// convert units,eg. 3dp will converted into underlying pixels
 private[macroid] trait DisplayUnits extends MediaQueryEssentials {
   implicit class Units[A](v: A)(implicit ctx: ContextWrapper, numeric: Numeric[A]) {
     import Numeric.Implicits.infixNumericOps

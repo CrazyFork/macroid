@@ -49,7 +49,7 @@ object TextTweaks {
 
 /** Extra tweaks for ImageView */
 object ImageTweaks {
-  type W = ImageView
+  type W = ImageView //bm: constraint this tweak only to ImageView
 
   def res(resourceId: Int) = Tweak[W](_.setImageResource(resourceId))
   def bitmap(bitmap: Bitmap) = Tweak[W](_.setImageBitmap(bitmap))

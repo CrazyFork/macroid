@@ -7,7 +7,7 @@ import scala.reflect.macros.blackbox
 
 /** This trait contains basic building blocks used to define layouts: w, l and slot */
 private[macroid] trait LayoutBuilding {
-
+  //bm: 这个地方之所以不用 Ui{new W(ctx, ..args)} 是因为用不了 :(, 所以只能用macro实现了
   /** Define a widget */
   def widget[W <: View](implicit ctx: ContextWrapper): Ui[W] = macro LayoutBuildingMacros.widgetImpl[W]
 
@@ -46,6 +46,6 @@ class LayoutBuildingMacros(val c: blackbox.Context) {
 
   def layoutUiImpl[L <: ViewGroup: c.WeakTypeTag](children: c.Expr[Ui[View]]*)(ctx: c.Expr[ContextWrapper]): Tree = {
     val untypechecked = children.map(ch ⇒ c.untypecheck(ch.tree))
-    q"_root_.macroid.Ui.sequence(..$untypechecked).map(ch ⇒ new ${weakTypeOf[L]}($ctx.getOriginal) { ch.foreach(this.addView) })"
+    q"_root_.macroid.Ui.sequence(..$untypechecked).map(ch ⇒ new ${weakTypeOf[L]}($ctx.getOriginal) { ch.foreach(this.addView) })" //todo:?
   }
 }

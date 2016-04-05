@@ -2,7 +2,7 @@ package macroid
 
 import scala.language.experimental.macros
 import scala.language.implicitConversions
-import scala.language.postfixOps
+import scala.language.postfixOps// enable `<text goes here>` feature
 import android.os.Bundle
 import macroid.contrib.Layouts.RootFrameLayout
 import macroid.support.Fragment
@@ -10,6 +10,7 @@ import macrocompat.bundle
 import scala.reflect.macros.blackbox
 
 /** A fragment builder proxy */
+// record Fragment creation procedures
 case class FragmentBuilder[F](constructor: Ui[F], arguments: Bundle)(implicit ctx: ContextWrapper, fragment: Fragment[F]) {
   import Searching._
   import Bundles._
@@ -17,8 +18,9 @@ case class FragmentBuilder[F](constructor: Ui[F], arguments: Bundle)(implicit ct
   /** Pass arguments in a Bundle */
   def pass(bundle: Bundle) = FragmentBuilder(constructor, arguments + bundle)
   /** Pass arguments, which will be put into a Bundle */
-  def pass(arguments: (String, Any)*): FragmentBuilder[F] = macro FragmentBuildingMacros.passImpl[F]
+  def pass(arguments: (String, Any)*): FragmentBuilder[F] = macro FragmentBuildingMacros.passImpl[F]//todo: is macro needed?
 
+  // apply arguments to fragment f, then return f
   /** Fragment factory. In contrast to `constructor`, `factory` passes arguments to the fragment */
   def factory = constructor map { f ⇒ fragment.setArguments(f, arguments); f }
 
@@ -89,7 +91,7 @@ class FragmentBuildingMacros(val c: blackbox.Context) {
   }
 
   def passImpl[F: c.WeakTypeTag](arguments: c.Expr[(String, Any)]*): Tree = {
-    val Apply(Apply(_, List(constructor, args)), List(ctx, fragment)) = c.prefix.tree
+    val Apply(Apply(_, List(constructor, args)), List(ctx, fragment)) = c.prefix.tree //get parent FragmentBuilder instance tree
     q"_root_.macroid.FragmentBuilder($constructor, $args + bundle(..$arguments))($ctx, $fragment)"
   }
 }

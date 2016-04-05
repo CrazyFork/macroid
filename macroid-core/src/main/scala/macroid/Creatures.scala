@@ -53,7 +53,7 @@ case class Transformer(f: PartialFunction[View, Ui[Any]]) {
   def apply(w: View): Ui[Any] = {
     val self = f.applyOrElse(w, Function.const(Ui.nop))
     val children = w match {
-      case Transformer.Layout(children @ _*) ⇒ Ui.sequence(children.map(apply): _*)
+      case Transformer.Layout(children @ _*) ⇒ Ui.sequence(children.map(apply): _*)//todo: ?
       case _ ⇒ Ui.nop
     }
     self ~ children
@@ -66,7 +66,7 @@ object Transformer {
 
   /** Layout extractor */
   object Layout {
-    def unapplySeq(w: View): Option[Seq[View]] = w match {
+    def unapplySeq(w: View): Option[Seq[View]] = w match {//todo:?
       case g: ViewGroup ⇒ Some((0 until g.getChildCount).map(i ⇒ g.getChildAt(i)))
       case _ ⇒ None
     }

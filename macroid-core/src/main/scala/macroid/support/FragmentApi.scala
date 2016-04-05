@@ -36,6 +36,11 @@ sealed trait FragmentApi[-F, M, -A] {
   def fragmentManager: F ⇒ M
   def activityManager: A ⇒ M
   def findFragmentByTag[F1 <: F](m: M, t: String): Option[F1]
+  /*
+  i: parent container id
+  t- tag: fragment tag, for later retrieval
+  f: target fragment
+   */
   def addFragment(m: M, i: Int, t: String, f: F): Unit
 }
 

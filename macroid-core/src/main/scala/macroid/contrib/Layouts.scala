@@ -6,6 +6,7 @@ import android.widget.{ FrameLayout, GridLayout, LinearLayout, RelativeLayout }
 import android.content.Context
 
 object Layouts {
+  //bm: extends class with Constructor call
   /** A LinearLayout that is preset to be vertical */
   class VerticalLinearLayout(ctx: Context) extends LinearLayout(ctx) {
     setOrientation(LinearLayout.VERTICAL)
@@ -31,7 +32,7 @@ object Layouts {
   /** A FrameLayout that does not expose its children’s ids */
   class RootFrameLayout(ctx: Context) extends FrameLayout(ctx) {
     override def addView(child: View, index: Int, params: LayoutParams) = {
-      child.getClass.getMethod("setIsRootNamespace", classOf[Boolean]).invoke(child, Boolean.box(true))
+      child.getClass.getMethod("setIsRootNamespace", classOf[Boolean]).invoke(child, Boolean.box(true))//bm: Boolean.box
       super.addView(child, index, params)
     }
   }
