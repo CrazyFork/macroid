@@ -7,10 +7,12 @@ import android.content.DialogInterface
 import android.content.DialogInterface.OnClickListener
 import android.widget.ListAdapter
 
+// Phrase recording an operation AlertDialog.Builder can do
 case class Phrase(f: AlertDialog.Builder ⇒ Unit) {
   def apply(d: AlertDialog.Builder) = f(d)
 }
 
+// defines ways to create AlertDialog.Builder
 private[macroid] trait DialogBuilding {
   /** A helper class to provide different ways of building a dialog */
   class DialogBuilder[A](theme: Option[Int]) {
@@ -85,6 +87,8 @@ private[macroid] trait Phrases {
 object Phrases extends Phrases
 
 private[macroid] trait Phrasing extends DialogImplicits {
+  // record applying of phase on AlertDialog, then return the dialog back
+  // add Ui[AlertDialog.Builder] <~ behaviour
   implicit class PhrasingOps(dialog: Ui[AlertDialog.Builder]) {
     def <~(phrase: Phrase) = dialog map { d ⇒ phrase(d); d }
   }

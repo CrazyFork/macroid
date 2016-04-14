@@ -41,7 +41,7 @@ object TextTweaks {
   val medium = size(18)
   val large = size(22)
 
-  def allCaps: Tweak[W] = allCaps(false)
+  def allCaps: Tweak[W] = allCaps(false)//default to lower case
   def allCaps(value: Boolean) = Tweak[W](_.setAllCaps(value))
 
   private def typefaceStyle(x: W) = Option(x.getTypeface).map(_.getStyle).getOrElse(Typeface.NORMAL)

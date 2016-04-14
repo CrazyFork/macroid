@@ -49,6 +49,7 @@ object Snail {
   def blank[W <: View] = Snail[W](_ ⇒ Future.successful(()))
 }
 
+// apply Ui action from root to all child nodes
 case class Transformer(f: PartialFunction[View, Ui[Any]]) {
   def apply(w: View): Ui[Any] = {
     val self = f.applyOrElse(w, Function.const(Ui.nop))
