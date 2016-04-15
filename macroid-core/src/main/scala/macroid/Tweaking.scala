@@ -30,6 +30,7 @@ object CanTweak {
       def tweak(l: L, t: Transformer) = t(l).withResult(l)
     }
 
+  // 这里的 F type 表示 container
   implicit def `Widget is tweakable with Effector`[W <: View, F[+_], T, R](implicit effector: Effector[F], canTweak: CanTweak[W, T, R]): CanTweak[W, F[T], W] =
     new CanTweak[W, F[T], W] {
       // 注意如果F是Future, 这里的 effector.foreach 也不需要传入implicit execution context,

@@ -18,7 +18,7 @@ import macroid.support.{ Fragment, FragmentApi }
   * @param start  The starting id.
   */
 class IdGenerator(start: Int) extends Dynamic {
-  private var ids = Map.empty[String, Int]//max id: 65535?
+  private var ids = Map.empty[String, Int] //max id: 65535?
   private var counter = start
 
   private val lock = new Object

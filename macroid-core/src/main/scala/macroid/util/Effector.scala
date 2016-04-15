@@ -6,7 +6,6 @@ import scala.language.higherKinds
 import scala.concurrent.{ Future, ExecutionContext }
 import scala.util.Try
 
-
 /*
 this module easy container Types for calling UiAction on its items
 

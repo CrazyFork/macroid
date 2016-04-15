@@ -44,7 +44,7 @@ private[macroid] trait PaddingTweaks {
 
   /** Set padding */
   def padding(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0, all: Int = -1) = if (all >= 0) {
-    Tweak[View](_.setPadding(all, all, all, all))// _ stands for the targeted view component
+    Tweak[View](_.setPadding(all, all, all, all)) // _ stands for the targeted view component
   } else {
     Tweak[View](_.setPadding(left, top, right, bottom))
   }
@@ -55,7 +55,7 @@ private[macroid] trait LayoutTweaks {
   /** Use `LayoutParams` of the specified layout class */
   def layoutParams[L <: ViewGroup](params: Any*): Tweak[View] = macro LayoutTweakMacros.layoutParamsImpl[L]
   /** Use `LayoutParams` of the specified layout class */
-  def lp          [L <: ViewGroup](params: Any*): Tweak[View] = macro LayoutTweakMacros.layoutParamsImpl[L]
+  def lp[L <: ViewGroup](params: Any*): Tweak[View] = macro LayoutTweakMacros.layoutParamsImpl[L]
 
   /** Make this layout vertical */
   val vertical = Tweak[LinearLayout](_.setOrientation(LinearLayout.VERTICAL))
@@ -143,7 +143,6 @@ class BasicTweakMacros(val c: blackbox.Context) {
   }
 }
 
-
 @bundle
 class LayoutTweakMacros(val c: blackbox.Context) {
   import c.universe._
@@ -212,7 +211,7 @@ class EventTweakMacros(val c: blackbox.Context) {
       on: public void onClick(View v)
       tp: Button
      */
-    (setter, listener, on, tp)// setter, listener setter
+    (setter, listener, on, tp) // setter, listener setter
   }
 
   sealed trait ListenerType

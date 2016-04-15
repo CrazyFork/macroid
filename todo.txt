@@ -8,7 +8,11 @@
 
   [Java WeakReference的理解与使用](http://puretech.iteye.com/blog/2008663)
 
+  type class:
+    http://www.cakesolutions.net/teamblogs/demystifying-implicits-and-typeclasses-in-scala
+    http://danielwestheide.com/blog/2013/02/06/the-neophytes-guide-to-scala-part-12-type-classes.html
 
+    Effector.scala 是一个典型的 type class pattern
 
 notation:
   bm: book mark
@@ -23,6 +27,9 @@ notation:
   to the Scala 2.11/2 macro API.
 
 代码模块化组织:
+  比较有特点的文件:
+    cakes.scala  Snailing.scala, Excerpting.scala Tweaks.scala
+
   整个代码的模块化组织都是靠
     private[<root_package] trait X extends X1, X2, X3
     object X extends X
@@ -30,13 +37,24 @@ notation:
       1.可以将随意的逻辑拆成更小的单元, 然后随意组织继承组合成大的模块然后导出给client side
       2.可以更加准确的控制导出的实体(方法,变量,class, object)的可见度
 
+    具体可以看 cakes.scala 文件
+
     more info : <programming in scala 2nd edition> @ chapter 29 - Modular Programming Using Objects
 
+  type class:
+    http://www.cakesolutions.net/teamblogs/demystifying-implicits-and-typeclasses-in-scala
+    http://danielwestheide.com/blog/2013/02/06/the-neophytes-guide-to-scala-part-12-type-classes.html
+
+    Snailing.scala, Excerpting.scala 等等都是 scala type class 模式的实现
 
 
-  package.scala
-  Tweaks.scala 中 Tweaks 的定义
-  
+object extends class pattern
+  IdGeneratorSpec
+    object Id extends IdGenerator(1000)
+
+
+
+
 feature:
   重点文件
     UiActions.scala
@@ -50,7 +68,7 @@ feature:
     典型的macro应用, 通过动态解析 Ui[A] 里边返回的 Type, 和要绑定的 View 上事件定义的返回type。来判断两者是否一致
     如果一致 动态生成一个 Tweak 调用 setOnXXXListener , 并把Ui[A]里的action绑定到事件回调里边
 
-
+Tweak 表示一个target上的某个操作, Ui 泛指任何操作
 
 sbt cache resolution
   http://www.scala-sbt.org/0.13/docs/Cached-Resolution.html
@@ -63,26 +81,43 @@ todo:
     @implicitNotFound: 定义该类型的implicit没找到的时候的提示信息
     media query: formula for dpi -> px
       MediaQueries.scala 中有定义
+    dialogdsl.scala
+    ExtraTweaks.scala
 
   pending:
     UiActions.scala
       android looper
       calling ui method in android non-main thread
       Future - scala
-    Term Symbol?
+    Scala Macro
+      Term Symbol Tree
+      tweaks.scala
+        onBase method use path dependent types
+          http://danielwestheide.com/blog/2013/02/13/the-neophytes-guide-to-scala-part-13-path-dependent-types.html
+
+
     scala.collection.optimizer._
     android animation
+
     Programming in scala,
-      package chapter
+      - package chapter
       scala collections
+
     画脑图
+    revisit apis
+
     清理todos
+
     [asyc await](http://docs.scala-lang.org/sips/pending/async.html) @Snailing.scala
     read original project issues
+
     untypecheck vs typecheck
     read unit test
-    dialogdsl.scala
-    ExtraTweaks.scala
+
+    Covariance vs Contravariance
+      - http://docs.scala-lang.org/tutorials/tour/variances.html
+      http://blog.kamkor.me/Covariance-And-Contravariance-In-Scala/
+
 
 
 

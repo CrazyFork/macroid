@@ -32,7 +32,7 @@ object Layouts {
   /** A FrameLayout that does not expose its children’s ids */
   class RootFrameLayout(ctx: Context) extends FrameLayout(ctx) {
     override def addView(child: View, index: Int, params: LayoutParams) = {
-      child.getClass.getMethod("setIsRootNamespace", classOf[Boolean]).invoke(child, Boolean.box(true))//bm: Boolean.box
+      child.getClass.getMethod("setIsRootNamespace", classOf[Boolean]).invoke(child, Boolean.box(true)) //bm: Boolean.box
       super.addView(child, index, params)
     }
   }

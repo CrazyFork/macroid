@@ -3,8 +3,8 @@ package macroid
 import org.scalatest.FlatSpec
 import org.scalatest.concurrent.ScalaFutures
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class IdGeneratorSpec extends FlatSpec with ScalaFutures {
   behavior of "id generator"

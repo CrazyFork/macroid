@@ -137,7 +137,7 @@ case class UiFuture[T](future: Future[T]) extends AnyVal { //todo: why extends A
     * If the future is already completed and the current thread is the UI thread,
     * the UI action will be applied in-place, rather than asynchronously.
     */
-  def flatMapUi[S](f: Function[T, Ui[Future[S]]]) = {//return Future[X] not S
+  def flatMapUi[S](f: Function[T, Ui[Future[S]]]) = { //return Future[X] not S
     if (future.isCompleted && Ui.uiThread == Thread.currentThread) {
       /*
       -todo-: Future[S] 在这步没有完成状态应该怎么算？
@@ -157,7 +157,7 @@ case class UiFuture[T](future: Future[T]) extends AnyVal { //todo: why extends A
     * If the future is already completed and the current thread is the UI thread,
     * the UI action will be applied in-place, rather than asynchronously.
     */
-  def foreachUi[U](f: Function[T, Ui[U]]):Unit =
+  def foreachUi[U](f: Function[T, Ui[U]]): Unit =
     if (future.isCompleted && Ui.uiThread == Thread.currentThread) {
       future.value.get.foreach(applyUi(f))
     } else {

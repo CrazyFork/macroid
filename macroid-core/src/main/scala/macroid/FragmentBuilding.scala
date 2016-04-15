@@ -2,7 +2,7 @@ package macroid
 
 import scala.language.experimental.macros
 import scala.language.implicitConversions
-import scala.language.postfixOps// enable `<text goes here>` feature
+import scala.language.postfixOps // enable `<text goes here>` feature
 import android.os.Bundle
 import macroid.contrib.Layouts.RootFrameLayout
 import macroid.support.Fragment
@@ -18,7 +18,7 @@ case class FragmentBuilder[F](constructor: Ui[F], arguments: Bundle)(implicit ct
   /** Pass arguments in a Bundle */
   def pass(bundle: Bundle) = FragmentBuilder(constructor, arguments + bundle)
   /** Pass arguments, which will be put into a Bundle */
-  def pass(arguments: (String, Any)*): FragmentBuilder[F] = macro FragmentBuildingMacros.passImpl[F]//todo: is macro needed?
+  def pass(arguments: (String, Any)*): FragmentBuilder[F] = macro FragmentBuildingMacros.passImpl[F] //todo: is macro needed?
 
   // apply arguments to fragment f, then return f
   /** Fragment factory. In contrast to `constructor`, `factory` passes arguments to the fragment */

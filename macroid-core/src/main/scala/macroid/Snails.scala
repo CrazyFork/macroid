@@ -20,7 +20,7 @@ private[macroid] object SnailScheduler {
 
 //discard result, convert future to new with recover abilities but discard f's result
 private[macroid] object AfterFuture {
-  def apply[A](f: Future[A])(implicit ec: ExecutionContext):Future[Unit] =
+  def apply[A](f: Future[A])(implicit ec: ExecutionContext): Future[Unit] =
     f.map(_ ⇒ ()) recover { case NonFatal(_) ⇒ () } //recover on non-fatal error
 }
 

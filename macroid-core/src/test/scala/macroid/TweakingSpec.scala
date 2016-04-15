@@ -18,13 +18,13 @@ class TweakingSpec extends FlatSpec {
 
   it should "work with effectors on the left" in {
     def foo() = {
-      Option(List(w[Button], w[TextView])) <~ show
+      Option(List(w[Button], w[TextView])) <~ show // calling `Effector is tweakable`
     }
   }
 
   it should "work with effectors on the right" in {
     def foo() = {
-      w[Button] <~ Option(List(show, text("doge")))
+      w[Button] <~ Option(List(show, text("doge"))) // calling `Widget is tweakable with Effector`
     }
   }
 

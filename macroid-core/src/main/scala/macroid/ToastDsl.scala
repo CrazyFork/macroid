@@ -3,7 +3,6 @@ package macroid
 import android.widget.Toast
 import android.view.View
 
-
 // Loaf is an operation mutate Toast
 case class Loaf(f: Toast ⇒ Unit) {
   def apply(t: Toast) = f(t)
