@@ -128,6 +128,8 @@ object Tweaks extends Tweaks
     macro-compat is a small library which, in conjunction with the macro-paradise
     compiler plugin, allows you to compile macros with Scala 2.10.x which are written
     to the Scala 2.11/2 macro API.
+
+ok: this is test
  */
 @bundle
 class BasicTweakMacros(val c: blackbox.Context) {
@@ -137,7 +139,8 @@ class BasicTweakMacros(val c: blackbox.Context) {
   def wireImpl[W <: View: c.WeakTypeTag](v: c.Expr[W]): Tree = {
     q"_root_.macroid.Tweak[${weakTypeOf[W]}] { x ⇒ $v = x }"
   }
-
+  // var content = slot[FrameLayout]
+  // l[FrameLayout]() <~ wire(content) // assign L[FrageLayout] to content
   def wireOptionImpl[W <: View: c.WeakTypeTag](v: c.Expr[Option[W]]): Tree = {
     q"_root_.macroid.Tweak[${weakTypeOf[W]}] { x ⇒ $v = Some(x) }"
   }

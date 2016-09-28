@@ -25,7 +25,7 @@ class FragmentApiSpec extends FlatSpec {
   }
 
   it should "work with legacy fragments in fragment" in {
-    import android.support.v4.app.Fragment
+    import android.support.v4.app.Fragment //bm: Fragment api usage
     def foo() = {
       class MyFragment extends Fragment with Contexts[Fragment] {
         f[Fragment].framed(1, "1")

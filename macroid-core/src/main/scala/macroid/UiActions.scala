@@ -5,6 +5,11 @@ import android.os.{ Handler, Looper }
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
+/*
+android Looper and scala Future are requisite for understanding this module
+ */
+
+
 /** An ExecutionContext associated with the UI thread */
 object UiThreadExecutionContext extends ExecutionContext {
   private lazy val uiHandler = new Handler(Looper.getMainLooper)

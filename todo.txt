@@ -54,7 +54,6 @@ object extends class pattern
 
 
 
-
 feature:
   重点文件
     UiActions.scala
@@ -62,7 +61,7 @@ feature:
     package.scala
 
   FragmentApi.scala
-    提供自动向后兼容的api
+    提供自动向后兼容的api, FragmentApiSpec 有此的用法
 
   EventTweakMacros
     典型的macro应用, 通过动态解析 Ui[A] 里边返回的 Type, 和要绑定的 View 上事件定义的返回type。来判断两者是否一致
@@ -83,6 +82,7 @@ todo:
       MediaQueries.scala 中有定义
     dialogdsl.scala
     ExtraTweaks.scala
+    read unit test
 
   pending:
     UiActions.scala
@@ -112,7 +112,7 @@ todo:
     read original project issues
 
     untypecheck vs typecheck
-    read unit test
+
 
     Covariance vs Contravariance
       - http://docs.scala-lang.org/tutorials/tour/variances.html

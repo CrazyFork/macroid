@@ -1,4 +1,4 @@
-addSbtPlugin("com.hanhuy.sbt" % "android-sdk-plugin" % "1.5.16")
+addSbtPlugin("com.hanhuy.sbt" % "android-sdk-plugin" % "1.5.20")
 
 addSbtPlugin("me.lessis" % "bintray-sbt" % "0.2.1")
 
